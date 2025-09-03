@@ -635,8 +635,8 @@ RHO2 <- rho2d(vertices[,1], vertices[,2])
 
 for(exp in c(1:5)){
   N = 1000
-  setwd("~/Research/IPP/2dAdaptive_MCMC_post_mesh_hole_repl/1000")
-  folder = paste("~/Research/IPP/2dAdaptive_MCMC_post_mesh_hole_repl/1000", "/", exp, sep = "")
+  setwd("~/Research/IPP/2dAdaptive_MCMC_post_mesh_repl/1000")
+  folder = paste("~/Research/IPP/2dAdaptive_MCMC_post_mesh_repl/1000", "/", exp, sep = "")
   setwd(folder)
   
   lambda_post = read.table("Post_l_star.csv", sep = ",")
@@ -713,12 +713,12 @@ i <- 1
 for(N in c(50, 250, 1000)){
   
   setwd("~/")
-  folder = paste("2dAdaptive_MCMC_post_mesh_slope_repl/", N, sep = "")
+  folder = paste("2dAdaptive_MCMC_post_mesh_repl/", N, sep = "")
   setwd(folder)
   
   exp = 1
   
-  folder = paste("~/Research/IPP/2dAdaptive_MCMC_post_mesh_slope_repl/", N, "/", exp, sep = "")
+  folder = paste("~/2dAdaptive_MCMC_post_mesh_repl/", N, "/", exp, sep = "")
   setwd(folder)
   gs_m = read.table("Post_gp.csv", sep = ",", fill = TRUE, header=FALSE)
   gs_m <- apply(gs_m, 2, as.numeric)
@@ -736,9 +736,11 @@ for(N in c(50, 250, 1000)){
   img_df <- data.frame(value = as.vector(post_mean_m$v))
   img_df$x <- exp_cov$y
   img_df$y <- exp_cov$x
-
+  
+  # change commented "y" for different diagonal 
   x = 1:800
-  y = x #801 - x
+  y = x 
+  # y = 801 - x
   
   pp_upper <- ppp(x = vertices[,1], y = vertices[,2],
             marks = apply(gs_m[seq(3/12 * (dim(gs_m)[1]),(dim(gs_m)[1])),], 2, quantile, probs = 0.9999, na.rm = TRUE), window = owin(poly_win))
@@ -760,8 +762,10 @@ for(N in c(50, 250, 1000)){
     ) + labs(x = expression(z[1]), y = expression(rho(z[1], z[1]))) + 
     geom_line(data = data.frame(x=seq(0,1,length.out = 800), y=rho_imag$v[cbind(x,y)]), mapping = aes(x = x, y = y), 
               color = "black", linetype = "solid", size = 1) + 
-    geom_ribbon(data = data.frame(x = seq(0,1,length.out = 800), y2 = upper$v[cbind(x,y)], y1 = lower$v[cbind(x,y)], y=post_mean_m$v[cbind(x,y)]), mapping = aes(x = x, ymin = y1, y = y, ymax = y2),
-                fill = "dodgerblue3", alpha = 0.2)
+    geom_ribbon(data = data.frame(x = seq(0,1,length.out = 800), y2 = upper$v[cbind(x,y)], 
+                                                                 y1 = lower$v[cbind(x,y)], 
+                                                                 y=post_mean_m$v[cbind(x,y)]), 
+                mapping = aes(x = x, ymin = y1, y = y, ymax = y2), fill = "dodgerblue3", alpha = 0.2)
   marg_list[[i]] <- plot_M
   i <- i+1
 }
