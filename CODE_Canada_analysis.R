@@ -56,8 +56,8 @@ cov_2_list <- lapply(ontario_precip_june, rescaling,ontario_precip_june)
 cov_3_list <- lapply(ontario_wind_june, rescaling,ontario_wind_june) 
 
 # define observation window and discretization grid  
-ontario_mask = im(!is.na(ontario_precip_june$`2004`$v), xcol =ontario_precip_june$`2004`$xcol, yrow =ontario_precip_june$`2004`$yrow)
-ontario_dom = owin(ontario_mask$xrange,ontario_mask$yrange)
+ontario_mask <- im(!is.na(ontario_precip_june$`2004`$v), xcol =ontario_precip_june$`2004`$xcol, yrow =ontario_precip_june$`2004`$yrow)
+ontario_dom <- owin(ontario_mask$xrange,ontario_mask$yrange)
 grid_points <- expand.grid(x = cov_2_list$`2010`$xcol, y = cov_2_list$`2010`$yrow)
 
 # plot covariate maps for selection of years: Figure 4
@@ -118,17 +118,19 @@ kern_est <- colSums(fmat/sum(unlist(lapply(ontario_ppp_june, function(x){x$n})))
 spline_fit <- smooth.spline(xgrid, kern_est, spar = 0.8)
 
 # Bayesian analysis
-setwd("~/")
-source(file = "pCN_MCMC_GP_mult.R")
+setwd("~/Research/IPP/")
+source(file = "Adaptive_Anisotropic_GP.R")
 
 discr = xgrid
-n_iter <- 20000
+n_iter <- 2000
 
-adapt_multi_MCMC("ontario_temp_1d", n_iter, beta = 0.1, K = length(discr), 
-                 ontario_ppp_june, grid_points,  
-                 cov_1_list, d_k = discr, squared_exponential_kernel, 
-                 alpha1 = 1, alpha2 = 1, sigma_2 = 1, nu = 3/2, 
-                 exp_param = c(2,2), shape = 1, rate = 2, "lambda")
+MCMC("ontario_temp_1d", n_iter,
+     ontario_ppp_june, 
+     list(cov_1_list),
+     as.matrix(discr), window, exponential_cov,
+     beta = 0.1, alpha1 = 1, alpha2 = 1, 
+     sigma_2 = 1, nu = NA, exp_param = c(2,2),
+     shape = 1, rate = 2, "lambda")
 
 gs = read.table("Post_gp.csv", sep = ",", fill = TRUE, header=FALSE)
 gs <- apply(gs, 2, as.numeric)
@@ -258,16 +260,14 @@ kern_tot$yrow <- seq(kern_tot$xrange[1], kern_tot$xrange[2], length.out = 800)
 
 # Bayesian analysis 
 setwd("~/")
-source(file = "Adaptive_pCN_MCMC_2dGP_mult_mesh.R")
-MCMC("2dAdaptive_MCMC_multi_ontario", 
-     n_iter, beta = 0.1, K = dim(vertices)[1],
+
+MCMC("ontario_temp_prec_2d", n_iter,
      ontario_ppp_june, 
-     grid_points,ontario_dom,
-     cov_1_list, cov_2_list,
-     as.data.frame(vertices), triangle_centroids,
-     exponential_cov, alpha1=1, alpha2=1, sigma_2 = 1, nu = NA,
-     exp_param = c(2,2), shape = 1, rate = 2, 
-     link = "lambda", LS = "anisotropic")
+     list(cov_1_list, cov_2_list),
+     vertices, window, exponential_cov,
+     beta = 0.15, alpha1 = 1, alpha2 = 1, 
+     sigma_2 = 1, nu = NA, exp_param = c(2,2),
+     shape = 1, rate = 2, "lambda")
 
 
 gs_m = read.table("Post_gp.csv", sep = ",", fill = TRUE, header=FALSE)
@@ -387,7 +387,7 @@ ggplot(est, aes(x = x, y = y, fill = mean21)) +
 # mesh on unit cube using C++ program tetgen
 {
 cube <- as.matrix(expand.grid(rep(list(c(0, 1)), 3))[,1:3])
-setwd(paste("~/","3d_mesh", sep = ""))
+setwd(paste("~/Research/IPP/","3d_mesh", sep = ""))
 write_poly_file <- function(points, file = "covariate_domain.poly") {
   library(geometry)
   # Compute convex hull faces
@@ -419,29 +419,28 @@ write_poly_file <- function(points, file = "covariate_domain.poly") {
   message("Written .poly file: ", file)
 }
 write_poly_file(cube)
-run_tetgen <- function(poly_file, flags = "-pq1.2a0.0004") {
+run_tetgen <- function(poly_file, flags = "-pq1.2a0.001") {
   cmd <- sprintf("./tetgen %s %s", flags, poly_file)
   system(cmd)
 }
-run_tetgen("covariate_domain.poly",flags = "-pq1.2a0.0004")
+run_tetgen("covariate_domain.poly",flags = "-pq1.2a0.001")
 nodes <- read.table(paste("covariate_domain", "1", "node", sep = "."), skip = 1)[, 2:4]
 tets <- read.table(paste("covariate_domain", "1", "ele", sep = "."), skip = 1)[, 2:5]
 }
 
 # Bayesian analysis 
-setwd("~/")
-source(file = "pCN_mbGP_3Dmesh_multi.R")
-n_iter = 40000
+setwd("~/Research/IPP/")
+source(file = "Adaptive_Anisotropic_GP.R")
+n_iter = 2000
 
-MCMC("_ontario", 
-     n_iter, beta = 0.1, K = dim(nodes)[1],
-     ontario_ppp_june,
-     ontario_dom,
-     cov_1_list, cov_2_list, cov_3_list,
-     as.data.frame(nodes),
-     exponential_cov, alpha1 = 1, alpha2 = 1, sigma_2 = 1, nu = NA,
-     exp_param = c(2,2), shape = 1, rate = 2, 
-     "lambda", "anisotropic") 
+MCMC("ontario_temp_prec_wind_3d", n_iter,
+     ontario_ppp_june, 
+     list(cov_1_list, cov_2_list, cov_3_list),
+     discretization = nodes, window, exponential_cov,
+     beta = 0.1, alpha1 = 1, alpha2 = 1, 
+     sigma_2 = 1, nu = NA, exp_param = c(2,2),
+     shape = 1, rate = 2, "lambda")
+     #,Index_over_dom, Index_over_loc)
 
 gs_m = read.table("Post_gp.csv", sep = ",", fill = TRUE, header=FALSE)
 gs_m <- apply(gs_m, 2, as.numeric)

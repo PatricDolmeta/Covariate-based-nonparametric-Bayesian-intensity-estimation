@@ -20,6 +20,7 @@ library(viridis)
 library(scico)
 library(RColorBrewer)
 library(pals)
+library(tictoc)
 
 ### SET WORKING DIRECTORY TO SOURCE FILE LOCATION
 
@@ -48,7 +49,7 @@ plot(im(Cov[dim(Cov)[1]:1,]))
 mu = rep(0, length(grid_points$x))
 
 # N replicates of covariate process Z_1 
-M <- 1e+01
+M <- 1e+03
 cov1_list <- list()
 dim = length(grid_points$x)
 for(i in 1:M){
@@ -175,7 +176,7 @@ combined_plot
     for(exp in 1:100){
       multi_kernel <- Map(function(loc_i, cov_i){kernel_function(loc_i, cov_i)}, 
                           loc_list[((exp-1)*1000 + 1):((exp-1)*1000 + N)], 
-                          cov_list[((exp-1)*1000 + 1):((exp-1)*1000 + N)])
+                          cov1_list[((exp-1)*1000 + 1):((exp-1)*1000 + N)])
       arr <- array(unlist(multi_kernel), dim = c(200, 3, length(multi_kernel)))
       avg_matrix <- apply(arr, c(1, 2), mean, na.rm = TRUE)
       L2_exp[i,exp]<-(sqrt(sum((avg_matrix[,1] - rho(discr))^2)/length(discr)))
@@ -198,23 +199,22 @@ L2_bay_exp = matrix(NA,4,100)
 L2_bay_rel_exp = matrix(NA,4,100)
 
 for(N in c(50,250,500,1000)){
-  setwd("~/")
-  source(file = "pCN_MCMC_GP_mult.R")
-  folder = paste("Adaptive_MCMC_post_multi/", N, sep = "")
-  dir.create(paste("~/", folder, sep = ""))
+  setwd("~/Research/IPP")
+  source(file = "Adaptive_Anisotropic_GP.R")
+  folder = paste("your_folder_name/", N, sep = "")
+  dir.create(paste("~/Research/IPP/", folder, sep = ""))
   setwd(folder)
   discr <- seq(0,1, length.out = 200)
-    n_iter <- 20000
+  n_iter <- 20000
   for(exp in 1:100){
     setwd("~/Research/IPP/")
-    source(file = "pCN_MCMC_GP_mult.R")
-    adapt_multi_MCMC(paste0(N, "/", exp, sep = ""), 
-                     n_iter, beta = 0.08, K = length(discr), 
-                     loc_list[((exp-1)*1000 + 1):((exp-1)*1000 + N)], grid_points, 
-                     cov1_list[((exp-1)*1000 + 1):((exp-1)*1000 + N)], d_k = discr,
-                     squared_exponential_kernel, alpha1 = 1, alpha2 = 1, 
-                     sigma_2 = 1, nu = 3/2, exp_param = c(2,2),
-                     shape = 1, rate = 2, "lambda")
+    MCMC(paste0(folder, exp, sep = "/"), n_iter,
+         loc_list[((exp-1)*1000 + 1):((exp-1)*1000 + N)], 
+         list(c(cov1_list[((exp-1)*1000 + 1):((exp-1)*1000 + N)])),
+         as.matrix(discr), window, exponential_cov,
+         beta = 0.15, alpha1 = 1, alpha2 = 1, 
+         sigma_2 = 1, nu = NA, exp_param = c(2,2),
+         shape = 1, rate = 2, "lambda")
     
     # upload posterior draws for rho
     gs = read.table("Post_gp.csv", sep = ",", fill = TRUE, header=FALSE)
@@ -249,7 +249,7 @@ for(i in 1:3){
   
   spline_fit_est <- smooth.spline(discr, avg_matrix[,1], spar = 0.8)
   
-  folder = paste("~/Adaptive_MCMC_post_multi/neg_exp/", M, "/", exp, sep = "")
+  folder = paste("~Reaserch/IPP/", folder, "/", M, "/", exp, sep = "")
   setwd(folder)
   gs = read.table("Post_gp.csv", sep = ",", fill = TRUE, header=FALSE)
   gs <- apply(gs, 2, as.numeric)
@@ -295,7 +295,7 @@ trace_plot6 <- trace_plot1
 trace_plot7 <- trace_plot1
 
 for(exp in c(2,4,6,8,10,12)){
-  folder = paste("~/Adaptive_MCMC_post_multi/1000", "/", exp, sep = "")
+  folder = paste("~Research/IPP/your_folder_name/1000", "/", exp, sep = "")
   setwd(folder)
   
   lambda_post = read.table("Post_l_star.csv", sep = ",")
@@ -493,7 +493,7 @@ L2d_rel_exp = matrix(NA,4,100)
 i = 1
 for(N in c(10,50,250,1000)){
   for(exp in 1:100){
-      kern_years <- lapply(c(((exp-1)*1000 + 1):((exp-1)*1000 + N)), function(i){rho2hat(loc2d_list_slope[[i]], 
+      kern_years <- lapply(c(((exp-1)*1000 + 1):((exp-1)*1000 + N)), function(i){rho2hat(loc2d_list[[i]], 
                               cov1_list[[i]], cov2_list[[i]], method = "ratio", dimyx = c(200,200))$v})
       kern2_est$v <- apply(simplify2array(kern_years), c(1, 2), mean, na.rm = TRUE)
       
@@ -518,24 +518,23 @@ L2_2dbay_rel_exp = matrix(NA,5,10)
 bet = c(0.3, 0.15, 0.1, 0.08)
 
 for(N in c(10,50,250,1000)){
-  setwd("~/")
-  source(file = "Adaptive_pCN_MCMC_2dGP_mult_mesh.R")
-  folder = paste("2dAdaptive_MCMC_post_mesh_rep/", N, sep = "")
+  setwd("~/Research/IPP")
+  source(file = "Adaptive_Anisotropic_GP.R")
+  folder = paste("your_folder_name/", sep = "")
   dir.create(paste("~/Research/IPP/", folder, sep = ""))
   setwd(folder)
+  n_iter <- 20000
   for(exp in 1:100){
     setwd("~/Research/IPP/")
-    source(file = "Adaptive_pCN_MCMC_2dGP_mult_mesh.R")
-
-    MCMC(paste("2dAdaptive_MCMC_post_mesh_rep/",N, "/", exp,sep = ""), n_iter, beta = bet[i],
-       K = dim(vertices)[1], loc2d_list_doublebump[((exp-1)*1000 + 1):((exp-1)*1000 + N)], 
-       grid_points, window,
-       cov1_list[((exp-1)*1000 + 1):((exp-1)*1000 + N)], 
-       cov2_list[((exp-1)*1000 + 1):((exp-1)*1000 + N)],
-       as.data.frame(vertices), triangle_centroids,
-       exponential_cov, alpha1=1, alpha2=1, sigma_2 = 1, nu = NA,
-       exp_param = c(2,2), shape = 1, rate = 2, 
-       link = "lambda", LS = "anisotropic")
+    MCMC(paste0(folder, "/", exp, sep = ""), n_iter,
+         loc2d_list[((exp-1)*1000 + 1):((exp-1)*1000 + N)], 
+         list(cov1_list[((exp-1)*1000 + 1):((exp-1)*1000 + N)],
+              cov2_list[((exp-1)*1000 + 1):((exp-1)*1000 + N)]),
+         vertices, window, exponential_cov,
+         beta = 0.15, alpha1 = 1, alpha2 = 1, 
+         sigma_2 = 1, nu = NA, exp_param = c(2,2),
+         shape = 1, rate = 2, "lambda",
+         Index_over_dom_hole_1000, Index_over_loc_prec_hole_1000)
     
     gs_m = read.table("Post_gp.csv", sep = ",", fill = TRUE, header=FALSE)
     gs_m <- apply(gs_m, 2, as.numeric)
@@ -559,12 +558,12 @@ print(paste(round(result$mean,2), "(", round(result$sd,2), ")&"))
 #################### Figure 3: functional estimates ################################ 
 plot_list2 <- list()
 i = 1
-for(M in c(50, 250, 1000)){
-  setwd("~/")
-  folder = paste("2dAdaptive_MCMC_post_mesh_repl/", M, sep = "")
+for(N in c(50, 250, 1000)){
+  setwd("~/Reaserch/IPP")
+  folder = paste("your_folder_name/", N, sep = "")
   setwd(folder)
   exp = 1
-  folder = paste("~/Research/IPP/2dAdaptive_MCMC_post_mesh_repl/", M, "/", exp, sep = "")
+  folder = paste("~/Research/IPP/your_folder_name/", N, "/", exp, sep = "")
   setwd(folder)
   
   gs_m = read.table("Post_gp.csv", sep = ",", fill = TRUE, header=FALSE)
@@ -635,8 +634,8 @@ RHO2 <- rho2d(vertices[,1], vertices[,2])
 
 for(exp in c(1:5)){
   N = 1000
-  setwd("~/Research/IPP/2dAdaptive_MCMC_post_mesh_repl/1000")
-  folder = paste("~/Research/IPP/2dAdaptive_MCMC_post_mesh_repl/1000", "/", exp, sep = "")
+  setwd("~/Research/IPP/your_folder_name/1000")
+  folder = paste("~/Research/IPP/your_folder_name/1000", "/", exp, sep = "")
   setwd(folder)
   
   lambda_post = read.table("Post_l_star.csv", sep = ",")
@@ -712,13 +711,13 @@ marg_list <- list()
 i <- 1
 for(N in c(50, 250, 1000)){
   
-  setwd("~/")
-  folder = paste("2dAdaptive_MCMC_post_mesh_repl/", N, sep = "")
+  setwd("~/Research/IPP/")
+  folder = paste("your_folder_name/", N, sep = "")
   setwd(folder)
   
   exp = 1
   
-  folder = paste("~/2dAdaptive_MCMC_post_mesh_repl/", N, "/", exp, sep = "")
+  folder = paste("~/Research/IPP/your_folder_name/", N, "/", exp, sep = "")
   setwd(folder)
   gs_m = read.table("Post_gp.csv", sep = ",", fill = TRUE, header=FALSE)
   gs_m <- apply(gs_m, 2, as.numeric)
