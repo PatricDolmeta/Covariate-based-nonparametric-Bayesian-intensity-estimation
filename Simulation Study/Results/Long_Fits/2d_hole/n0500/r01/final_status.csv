@@ -1,0 +1,2 @@
+"scenario","n","rep","data_id","n_iter","max_rhat","min_ess_bulk","min_ess_tail","pass","smoke","finished"
+"2d_hole",500,1,"5b48a5f08775cbe3a09ebd6ec26eca83",250000,1.00899973238739,249.419712121851,574.60280129893,TRUE,FALSE,"2026-10-12 16:38:03.213476"

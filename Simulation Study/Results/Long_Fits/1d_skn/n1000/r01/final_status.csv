@@ -1,0 +1,2 @@
+"scenario","n","rep","data_id","n_iter","max_rhat","min_ess_bulk","min_ess_tail","pass","smoke","finished"
+"1d_skn",1000,1,"cdfd16abed5de463ef12597480c37d07",200000,1.00919832637986,204.775306308544,501.662920649359,TRUE,FALSE,"2026-10-12 14:38:54.309646"

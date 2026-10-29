@@ -1,0 +1,2 @@
+"scenario","data_id","chains","draws_per_chain","pooled_relative_L2","basic_relative_L2","max_rhat","min_bulk_ess","min_tail_ess","all_pass_targets","interval_truth_fraction"
+"r01","2fda9d20086761ef9cd7a66ac050adff",2,25000,0.0592297354548038,NA,1.00418605801763,230.437232742089,441.786563445842,TRUE,0.879722222222222
