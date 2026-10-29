@@ -1,0 +1,10 @@
+# chains, checkpoints and worker logs from re-runs
+Fits/
+Work/
+*.rds
+*checkpoint*
+*.log
+# local helpers
+.Rhistory
+.RData
+!Application/Data/*.RData

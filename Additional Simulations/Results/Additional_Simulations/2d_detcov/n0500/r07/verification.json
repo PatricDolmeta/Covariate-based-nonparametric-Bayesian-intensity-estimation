@@ -1,0 +1,21 @@
+{
+  "verified": true,
+  "verified_at": "2026-10-17 03:46:21.313517",
+  "data_id": "2b529f5bc2c2ba6a1fdde6fe0bff64fd",
+  "files": {
+    "compact_fit.rds": "2fecd5c6bbaac957695beff4565bc64c",
+    "summary.csv": "b4ddb30edd49c5a09335f172669e192d",
+    "points.csv": "f935bcc8a4069a57ece8afc03bdda8bb",
+    "diagnostics.csv": "ee649100b4c0441d8f0c7042d37bf18d",
+    "parameters.csv": "b999bd5973a9700f17c7e9f631ded37f",
+    "errors.csv": "18a954ba038baa9191ce8ff2d7ff56cd",
+    "chain.csv": "cff96ee10bbdb50c3bb5e56a46f49ec6",
+    "timings.csv": "8fbbfb6f6617afdc5d326dbb0e92e254",
+    "concentration.csv": "2f6b82f6e2f984bb12938c6462d52e4a",
+    "kernel_scores.csv": "81f385220b1bf89ab266f76be424de3e",
+    "fit.pdf": "56c2584961c09d79b73162f0a47d3313",
+    "fit.png": "31cd2daa1a056bec4a50ed2791b54a40",
+    "trace.pdf": "cb4ac1d89d1a2869ea75a403b54d60f0",
+    "trace.png": "37d0a55a18fc03fdf4e4074f7ce622cf"
+  }
+}

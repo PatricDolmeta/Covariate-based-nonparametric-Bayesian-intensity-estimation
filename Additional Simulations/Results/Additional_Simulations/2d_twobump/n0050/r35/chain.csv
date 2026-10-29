@@ -1,0 +1,2 @@
+"chain","mcmc_seed","n_iter","burn","thin","draws","sampling_seconds","acceptance_w","beta","rho_star_start","acceptance_ell1","s_ell1","ell_start1","acceptance_ell2","s_ell2","ell_start2"
+1,93050042,60000,20000,10,4000,1727.16523241997,0.29873,0.130802372513891,0.216308160015928,0.4526,0.0440693470803435,0.155400601229157,0.431175,0.0487779938497828,1.39852664171825

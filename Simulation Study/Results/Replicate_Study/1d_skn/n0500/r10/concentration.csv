@@ -1,0 +1,3 @@
+"quantity","estimate","mean_square","mcse_delta","scope"
+"relative_posterior_RMS_L2",0.0582639975199316,0.00339469340700259,0.000342992249507375,"one-chain capped run; uncertainty precision not validated"
+"posterior_RMS_dZ",0.0995527788792502,0.00991075578258089,0.000441323865612865,"one-chain capped run; uncertainty precision not validated"

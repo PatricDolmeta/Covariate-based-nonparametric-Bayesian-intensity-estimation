@@ -1,0 +1,2 @@
+"scenario","n","rep","n_iter","max_rhat","min_ess_bulk","min_ess_tail","pass"
+"2d_hole",1000,3,400000,1.0152381872141,335.79991347173,518.598819000267,FALSE
